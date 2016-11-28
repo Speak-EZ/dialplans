@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="freeswitch/xml">
+    <section name="dialplan" description="curl_diaplan">
+        <include>
+            <context name="public">
+                <extension name="Incoming calls">
+                    <condition field="destination_number" expression="^(speakez-somali)$">
+                        <action application="transfer" data="4103 XML default"/>
+                    </condition>
+                </extension>
+
+                <extension name="leave_message_pool">
+                    <condition field="destination_number" expression="^2(\d{3})$">
+                        <action application="ring_ready"/>
+                        <action application="answer"/>
+                        <actsion application="sleep" data="2000"/>
+                        <action application="set" data="instance_id=$1"/>
+                        <action application="set" data="lmIP=$${local_ip_v4}"/>
+                        <action application="javascript" data="/opt/freeswitch/scripts/freedomfone/leave_message/main.js ${instance_id} ${lmIP}"/>
+                    </condition>
+                </extension>
+            </context>
+
+            <!--LEAVE A MESSAGE-->
+            <context name="default">
+                <!-- Default conference entrance-->
+                <extension name="conference_7500">
+                    <condition field="destination_number" expression="^7500$">
+                        <action application="answer"/>
+                        <action application="sleep" data="500"/>
+                        <action application="ivr" data="homework_help"/>
+                    </condition>
+                </extension>
+
+                <!-- Homework help conference room - subject 1 -->
+                <extension name="conf-hw1">
+                    <condition field="destination_number" expression="^conf_1$">
+                        <action application="answer"/>
+                        <action application="sleep" data="500"/>
+                        <action application="playback" data="$${sounds_dir}/homework_help/welcome_math.wav"/>
+                        <action application="bridge" data="sofia/gateway/Twilio-outbound/+13150000000"/>
+                        <action application="set" data="effective_caller_id_name=SpeakEZ"/>
+                        <action application="set" data="effective_caller_id_number=3150000000"/>
+                        <!-- The old conferencing approach
+                        <action application="set" data="conference_set_auto_outcall_timeout=5"/>
+                        <action application="conference_set_auto_outcall" data="sofia/gateway/Twilio-outbound/+13152514896"/>
+                        <action application="sleep" data="500"/>
+                        <action application="conference" data="hw1@default"/>
+                        -->
+                    </condition>
+                </extension>
+
+                <!-- Homework help conference room - subject 2 -->
+                <extension name="conf-hw2">
+                    <condition field="destination_number" expression="^conf_2$">
+                        <action application="answer"/>
+                        <action application="sleep" data="500"/>
+                        <action application="playback" data="$${sounds_dir}/homework_help/welcome_physics.wav"/>
+                        <action application="bridge" data="sofia/gateway/Twilio-outbound/+3150000000"/>
+                        <action application="set" data="effective_caller_id_name=SpeakEZ"/>
+                        <action application="set" data="effective_caller_id_number=3150000000"/>
+                    </condition>
+                </extension>
+
+                <!-- Homework help conference room - subject 3 -->
+                <extension name="conf-hw3">
+                    <condition field="destination_number" expression="^conf_3$">
+                        <action application="answer"/>
+                        <action application="sleep" data="500"/>
+                        <action application="playback" data="$${sounds_dir}/homework_help/welcome_cs.wav"/>
+                        <action application="bridge" data="sofia/gateway/Twilio-outbound/+3150000000"/>
+                        <action application="set" data="effective_caller_id_name=SpeakEZ"/>
+                        <action application="set" data="effective_caller_id_number=3150000000"/>
+                    </condition>
+                </extension>
+
+                <extension name="leave_message_pool">
+                    <condition field="destination_number" expression="^2(\d{3})$">
+                        <action application="ring_ready"/>
+                        <action application="answer"/>
+                        <action application="sleep" data="2000"/>
+                        <action application="set" data="instance_id=$1"/>
+                        <action application="set" data="lmIP=$${local_ip_v4}"/>
+                        <action application="javascript" data="/opt/freeswitch/scripts/freedomfone/leave_message/main.js ${instance_id} ${lmIP}"/>
+                    </condition>
+                </extension>
+
+                <!--ENABLE INTERNAL CALLS-->
+                <extension name="Local_Extension">
+                    <condition field="destination_number" expression="^(10[01][0-9])$">
+                        <action application="export" data="dialed_extension=$1"/>
+                        <!--action application="bind_meta_app" data="1 b s execute_extension::dx XML features"/-->
+                        <!--action application="bind_meta_app" data="2 b s record_session::$${recordings_dir}/${caller_id_number}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/-->
+                        <!--action application="bind_meta_app" data="3 b s execute_extension::cf XML features"/-->
+                        <!--action application="bind_meta_app" data="4 b s execute_extension::att_xfer XML features"/-->
+                        <action application="set" data="ringback=${us-ring}"/>
+                        <action application="set" data="transfer_ringback=$${hold_music}"/>
+                        <action application="set" data="call_timeout=30"/>
+                        <action application="set" data="hangup_after_bridge=true"/>
+                        <action application="set" data="continue_on_fail=true"/>
+                        <!--action application="hash" data="insert/${domain_name}-call_return/${dialed_extension}/${caller_id_number}"/-->
+                        <!--action application="hash" data="insert/${domain_name}-last_dial_ext/${dialed_extension}/${uuid}"/-->
+                        <!--action application="set" data="called_party_callgroup=${user_data(${dialed_extension}@${domain_name} var callgroup)}"/-->
+                        <!--action application="hash" data="insert/${domain_name}-last_dial_ext/${called_party_callgroup}/${uuid}"/-->
+                        <!--action application="hash" data="insert/${domain_name}-last_dial_ext/global/${uuid}"/-->
+                        <!--action application="hash" data="insert/${domain_name}-last_dial/${called_party_callgroup}/${uuid}"/-->
+                        <action application="bridge" data="user/${dialed_extension}@${domain_name}"/>
+                        <action application="answer"/>
+                        <!--action application="sleep" data="1000"/-->
+                        <!--action application="bridge" data="loopback/app=voicemail:default ${domain_name} ${dialed_extension}"/-->
+                    </condition>
+                </extension>
+
+                <!--OUTBOUND CALLS-->
+                <extension name="US_calls">
+                    <condition field="destination_number" expression="^(\d{11})$">
+                        <!--action application="set" data="continue_on_fail=true"/-->
+                        <action application="set" data="hangup_after_bridge=true"/>
+                        <!--action application="set" data="all_threads=true"/-->
+                        <action application="set" data="ignore_early_media=true"/>
+                        <!--action application="set" data="group_confirm_key=exec"/-->
+                        <action application="set" data="call_timeout=30"/>
+                        <!--action application="set" data="execute_on_answer=sched_hangup +0 alloted_timeout"/-->
+                        <!--action application="set" data="group_confirm_file=playback /opt/freedomfone/freeswitch/scripts/freedomfone/ivr/nodes/1417993389_weather_alert.wav"/-->
+                        <action application="bridge" data="sofia/gateway/Twilio-outbound/+1$1"/>
+                    </condition>
+                </extension>
+
+                <!--Voice broadcast-->
+                <extension name="Call_and_Play">
+                    <condition field="destination_number" expression="^(1221)$">
+                        <action application="lua" data="autogrcalls.lua"/>
+                    </condition>
+                </extension>
+
+                <!--VOICE MENUS-->
+                <extension name="ivr_pool">
+                    <condition field="destination_number" expression="^4(\d{3})$">
+                        <action application="answer"/>
+                        <action application="set" data="instance_id=$1"/>
+                        <action application="ivr" data="freedomfone_ivr_${instance_id}"/>
+                    </condition>
+                </extension>
+
+                <!--INBOUND GSMOPEN-->
+                <extension name="FS1-240016010774781">
+                    <condition field="destination_number" expression="^5000$">
+                        <action application="transfer" data="2100 XML default"/>
+                    </condition>
+                </extension>
+                <extension name="FS2-240016010774784">
+                    <condition field="destination_number" expression="^5003$">
+                        <action application="transfer" data="4100 XML default"/>
+                    </condition>
+                </extension>
+            </context>
+        </include>
+    </section>
+</document>

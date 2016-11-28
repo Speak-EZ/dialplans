@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="freeswitch/xml">
+    <section name="configuration">
+        <configuration name="ivr.conf" description="IVR menus">
+            <menus>
+                <menu name="freedomfone_ivr_100" greet-long="$${sounds_dir}/homework_help/welcome.wav" greet-short="$${sounds_dir}/homework_help/welcome.wav" invalid-sound="ivr/ivr-that_was_an_invalid_entry.wav" exit-sound="voicemail/vm-goodbye.wav" confirm-macro="" confirm-key="" tts-engine="flite" tts-voice="rms" confirm-attempts="3" timeout="10000" inter-digit-timeout="2000" max-failures="3" max-timeouts="3" digit-len="4">
+                    <entry digits="/^(\d)/" action="menu-exec-app" param="transfer conf_$1 XML default"/>
+                    <entry action="menu-top" digits="9"/>
+                    <entry action="menu-back" digits="0"/>
+                </menu>
+                <menu name="freedomfone_ivr_101" tts-engine="cepstral" tts-voice="allison" greet-long="$${ff_base_dir}/scripts/freedomfone/ivr/101/ivr/file_long.wav" invalid-sound="say: Invalid option. Please try again." timeout="3000" inter-digit-timeout="2000" max-failures="10" max-timeouts="4" digit-len="1">
+                    <entry action="menu-exec-app" digits="1" param="play_and_get_digits 1 1 1 1000 # $${ff_base_dir}/scripts/freedomfone/ivr/nodes/1413228363_bad_roads1.wav"/>
+                    <entry action="menu-exec-app" digits="1" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'VoIP KarenCIS' '1' '6' 'Node' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-exec-app" digits="2" param="play_and_get_digits 1 1 1 1000 # $${ff_base_dir}/scripts/freedomfone/ivr/nodes/1413228396_no_parks1.wav"/>
+                    <entry action="menu-exec-app" digits="2" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'VoIP KarenCIS' '2' '7' 'Node' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-exec-app" digits="3" param="play_and_get_digits 1 1 1 1000 # $${ff_base_dir}/scripts/freedomfone/ivr/nodes/1413228432_poor_personal_security1.wav"/>
+                    <entry action="menu-exec-app" digits="3" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'VoIP KarenCIS' '3' '8' 'Node' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-exec-app" digits="4" param="play_and_get_digits 1 1 1 1000 # $${ff_base_dir}/scripts/freedomfone/ivr/nodes/1413228503_speak_to_operators1.wav"/>
+                    <entry action="menu-exec-app" digits="4" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'VoIP KarenCIS' '4' '9' 'Node' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-exec-app" digits="5" param="play_and_get_digits 1 1 1 1000 # $${ff_base_dir}/scripts/freedomfone/ivr/nodes/1413228535_leave_a_message1.wav"/>
+                    <entry action="menu-exec-app" digits="5" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'VoIP KarenCIS' '5' '10' 'Node' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-top" digits="9"/>
+                    <entry action="menu-back" digits="0"/>
+                </menu>
+                <menu name="freedomfone_ivr_103" tts-engine="cepstral" tts-voice="allison" greet-long="$${ff_base_dir}/scripts/freedomfone/ivr/103/ivr/file_long.wav" greet-short="$${ff_base_dir}/scripts/freedomfone/ivr/103/ivr/file_short.wav" invalid-sound="$${ff_base_dir}/scripts/freedomfone/ivr/103/ivr/file_invalid.wav" exit-sound="$${ff_base_dir}/scripts/freedomfone/ivr/103/ivr/file_exit.wav" timeout="3000" inter-digit-timeout="2000" max-failures="10" max-timeouts="4" digit-len="1">
+                    <entry action="menu-exec-app" digits="1" param="transfer 2101 XML public"/>
+                    <entry action="menu-exec-app" digits="1" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'SpeakEZ' '1' '8' 'LmMenu' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-exec-app" digits="2" param="transfer 2103 XML public"/>
+                    <entry action="menu-exec-app" digits="2" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'SpeakEZ' '2' '54' 'LmMenu' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-sub" digits="3" param="freedomfone_ivr_100"/>
+                    <entry action="menu-exec-app" digits="3" param="javascript $${ff_base_dir}/scripts/freedomfone/monitor_ivr/main.js ${uuid} 'SpeakEZ' '3' '15' 'IvrMenu' '${caller_id_number}' '${destination_number}'"/>
+                    <entry action="menu-top" digits="9"/>
+                    <entry action="menu-back" digits="0"/>
+                </menu>
+            </menus>
+        </configuration>
+    </section>
+</document>
